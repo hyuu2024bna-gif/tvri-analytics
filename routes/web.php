@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FacebookAuthController;
 use App\Http\Controllers\InstagramAuthController;
 use App\Http\Controllers\ManualInputController;
 use App\Http\Controllers\ProfileController;
@@ -46,6 +47,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/instagram/connect', [InstagramAuthController::class, 'connect'])->name('instagram.connect');
     Route::get('/instagram/callback', [InstagramAuthController::class, 'callback'])->name('instagram.callback');
     Route::get('/instagram/status', [InstagramAuthController::class, 'status'])->name('instagram.status');
+    Route::get('/instagram/test', [InstagramAuthController::class, 'test'])->name('instagram.test');
+    Route::get('/instagram/test-media', [InstagramAuthController::class, 'testMedia'])->name('instagram.test-media');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/facebook/test', [FacebookAuthController::class, 'test'])->name('facebook.test');
+    Route::get('/facebook/test-posts', [FacebookAuthController::class, 'testPosts'])->name('facebook.test-posts');
 });
 
 require __DIR__.'/auth.php';
+

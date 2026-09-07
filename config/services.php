@@ -44,6 +44,8 @@ return [
         'app_id' => env('FACEBOOK_APP_ID'),
         'app_secret' => env('FACEBOOK_APP_SECRET'),
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
+        'graph_api_version' => env('META_GRAPH_API_VERSION', 'v19.0'),
+        'page_id' => env('META_FACEBOOK_PAGE_ID'),
     ],
 
 ];

@@ -18,4 +18,32 @@ class ChannelStatsDaily extends Model
     protected $casts = [
         'tanggal' => 'date',
     ];
+
+    /**
+     * Hitung pertambahan subscriber YouTube dalam rentang tanggal tertentu.
+     */
+    public static function getFollowersGained(?string $startDate = null, ?string $endDate = null): ?int
+    {
+        $query = static::query();
+        if ($startDate) {
+            $query->where('tanggal', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->where('tanggal', '<=', $endDate);
+        }
+        $snapshots = $query->orderBy('tanggal')->get();
+
+        if ($snapshots->count() < 2) {
+            return null;
+        }
+
+        $first = $snapshots->first();
+        $last = $snapshots->last();
+
+        if ($first->subscriber_count === null || $last->subscriber_count === null) {
+            return null;
+        }
+
+        return (int) ($last->subscriber_count - $first->subscriber_count);
+    }
 }

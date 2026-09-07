@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -12,7 +16,62 @@ class YoutubeService
 
     public function __construct()
     {
-        $this->apiKey = config('services.youtube.key');
+        $this->apiKey = (string) config('services.youtube.key');
+    }
+
+    /**
+     * Get configured HTTP client with retry and timeout.
+     */
+    protected function client(): PendingRequest
+    {
+        return Http::timeout(30)
+            ->retry(3, 1000, function (\Throwable $exception, $request) {
+                // Retry on transient network / connection drops / timeouts (cURL 28)
+                if ($exception instanceof ConnectionException) {
+                    return true;
+                }
+                // Retry on rate limit (429) or server errors (5xx)
+                if ($exception instanceof RequestException) {
+                    $status = $exception->response ? $exception->response->status() : 0;
+                    return $status === 429 || $status >= 500;
+                }
+                return false;
+            }, throw: false);
+    }
+
+    /**
+     * Execute GET request and handle errors safely without exposing credentials.
+     *
+     * @throws \RuntimeException
+     */
+    protected function get(string $endpoint, array $query = []): Response
+    {
+        $query['key'] = $this->apiKey;
+        $url = "{$this->baseUrl}/{$endpoint}";
+
+        try {
+            $response = $this->client()->get($url, $query);
+        } catch (\Throwable $e) {
+            Log::error("YouTube API network failure on endpoint [{$endpoint}]", [
+                'message' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException("Koneksi ke YouTube API gagal pada [{$endpoint}]: " . $e->getMessage(), 0, $e);
+        }
+
+        if (! $response->successful()) {
+            $status = $response->status();
+            $body = $response->json() ?? $response->body();
+
+            // Log error safely without query parameters/credentials
+            Log::error("YouTube API error on endpoint [{$endpoint}]", [
+                'status' => $status,
+                'error'  => is_array($body) ? ($body['error'] ?? $body) : substr((string) $body, 0, 300),
+            ]);
+
+            throw new \RuntimeException("Gagal mengambil data dari YouTube API [{$endpoint}]: HTTP status {$status}");
+        }
+
+        return $response;
     }
 
     public function getVideoStats(array $videoIds): array
@@ -21,16 +80,10 @@ class YoutubeService
             return [];
         }
 
-        $response = Http::get("{$this->baseUrl}/videos", [
+        $response = $this->get('videos', [
             'part' => 'snippet,statistics',
             'id' => implode(',', $videoIds),
-            'key' => $this->apiKey,
         ]);
-
-        if (! $response->successful()) {
-            Log::error('YouTube API error (videos.list)', ['body' => $response->body()]);
-            throw new \RuntimeException('Gagal mengambil data dari YouTube API: ' . $response->status());
-        }
 
         $items = $response->json('items', []);
 
@@ -47,16 +100,10 @@ class YoutubeService
 
     public function getUploadsPlaylistId(string $channelId): string
     {
-        $response = Http::get("{$this->baseUrl}/channels", [
+        $response = $this->get('channels', [
             'part' => 'contentDetails',
             'id' => $channelId,
-            'key' => $this->apiKey,
         ]);
-
-        if (! $response->successful()) {
-            Log::error('YouTube API error (channels.list contentDetails)', ['body' => $response->body()]);
-            throw new \RuntimeException('Gagal mengambil data channel: ' . $response->status());
-        }
 
         $playlistId = $response->json('items.0.contentDetails.relatedPlaylists.uploads');
 
@@ -73,18 +120,16 @@ class YoutubeService
         $pageToken = null;
 
         do {
-            $response = Http::get("{$this->baseUrl}/playlistItems", array_filter([
+            $query = [
                 'part' => 'contentDetails',
                 'playlistId' => $playlistId,
                 'maxResults' => 50,
-                'pageToken' => $pageToken,
-                'key' => $this->apiKey,
-            ]));
-
-            if (! $response->successful()) {
-                Log::error('YouTube API error (playlistItems.list)', ['body' => $response->body()]);
-                throw new \RuntimeException('Gagal mengambil daftar video: ' . $response->status());
+            ];
+            if ($pageToken) {
+                $query['pageToken'] = $pageToken;
             }
+
+            $response = $this->get('playlistItems', $query);
 
             $items = $response->json('items', []);
             foreach ($items as $item) {
@@ -106,16 +151,10 @@ class YoutubeService
 
     public function getChannelStats(string $channelId): array
     {
-        $response = Http::get("{$this->baseUrl}/channels", [
+        $response = $this->get('channels', [
             'part' => 'statistics',
             'id' => $channelId,
-            'key' => $this->apiKey,
         ]);
-
-        if (! $response->successful()) {
-            Log::error('YouTube API error (channels.list statistics)', ['body' => $response->body()]);
-            throw new \RuntimeException('Gagal mengambil statistik channel: ' . $response->status());
-        }
 
         $stats = $response->json('items.0.statistics');
 
@@ -130,3 +169,4 @@ class YoutubeService
         ];
     }
 }
+
