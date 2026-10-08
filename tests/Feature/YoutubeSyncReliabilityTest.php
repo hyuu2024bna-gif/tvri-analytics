@@ -9,6 +9,7 @@ use App\Models\Platform;
 use App\Services\YoutubeService;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -281,4 +282,34 @@ class YoutubeSyncReliabilityTest extends TestCase
         // Pastikan TIDAK ADA snapshot channel yang tercipta
         $this->assertDatabaseCount('channel_stats_daily', 0);
     }
+
+    /**
+     * Skenario F: Scheduler Registration.
+     * Memastikan youtube:sync terdaftar di scheduler dengan spesifikasi:
+     * - expression: 0 1 * * * (dailyAt 01:00)
+     * - timezone: Asia/Jakarta
+     * - withoutOverlapping: true
+     * - lock expiration: 60 menit
+     */
+    public function test_youtube_sync_scheduler_registration(): void
+    {
+        $schedule = app(Schedule::class);
+        $events = collect($schedule->events());
+
+        $youtubeEvent = $events->first(function ($event) {
+            return str_contains($event->command, 'youtube:sync');
+        });
+
+        $this->assertNotNull($youtubeEvent, 'Command youtube:sync harus terdaftar di scheduler');
+        $this->assertEquals('0 1 * * *', $youtubeEvent->expression, 'Jadwal harus 01:00 (0 1 * * *)');
+
+        $tz = $youtubeEvent->timezone instanceof \DateTimeZone
+            ? $youtubeEvent->timezone->getName()
+            : (string) $youtubeEvent->timezone;
+        $this->assertEquals('Asia/Jakarta', $tz, 'Timezone scheduler harus Asia/Jakarta');
+
+        $this->assertTrue($youtubeEvent->withoutOverlapping, 'withoutOverlapping harus aktif');
+        $this->assertEquals(60, $youtubeEvent->expiresAt, 'Lock expiration harus 60 menit');
+    }
 }
+

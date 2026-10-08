@@ -5,6 +5,13 @@
 
     <div class="py-6 max-w-2xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
+        @if(! config('services.sync.instagram', false))
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                <span>Integrasi Instagram saat ini <strong>dinonaktifkan</strong> pada Production Tahap 1 (YouTube & TikTok).</span>
+            </div>
+        @endif
+
         @if(session('status'))
             <div class="p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
                 {{ session('status') }}

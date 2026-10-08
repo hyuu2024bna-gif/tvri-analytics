@@ -26,10 +26,10 @@ class ChannelStatsDaily extends Model
     {
         $query = static::query();
         if ($startDate) {
-            $query->where('tanggal', '>=', $startDate);
+            $query->whereDate('tanggal', '>=', $startDate);
         }
         if ($endDate) {
-            $query->where('tanggal', '<=', $endDate);
+            $query->whereDate('tanggal', '<=', $endDate);
         }
         $snapshots = $query->orderBy('tanggal')->get();
 

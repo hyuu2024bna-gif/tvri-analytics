@@ -41,9 +41,13 @@ class FacebookService
 
         // Jika belum ada record khusus Facebook, gunakan koneksi Meta dari Instagram (yang menyimpan page_id & token)
         if (! $account || ! $account->access_token || ! $account->page_id) {
-            $account = SocialAccount::whereNotNull('page_id')
-                ->whereNotNull('access_token')
-                ->first();
+            $igPlatform = Platform::where('slug', 'instagram')->first();
+            $account = $igPlatform
+                ? SocialAccount::where('platform_id', $igPlatform->id)
+                    ->whereNotNull('page_id')
+                    ->whereNotNull('access_token')
+                    ->first()
+                : null;
         }
 
         if (! $account) {

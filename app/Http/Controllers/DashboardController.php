@@ -6,12 +6,19 @@ use App\Models\ChannelStatsDaily;
 use App\Models\Content;
 use App\Models\Platform;
 use App\Models\PlatformStatsDaily;
+use App\Services\YoutubeAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        protected ?YoutubeAnalyticsService $youtubeAnalytics = null
+    ) {
+        $this->youtubeAnalytics = $youtubeAnalytics ?? app(YoutubeAnalyticsService::class);
+    }
+
     public function index(Request $request)
     {
         $platformSlug = $request->query('platform', 'all');
@@ -36,8 +43,8 @@ class DashboardController extends Controller
             ->join('platforms', 'platforms.id', '=', 'contents.platform_id')
             ->where('contents.status', 'aktif')
             ->when(! $isAll, fn ($q) => $q->where('contents.platform_id', $currentPlatform->id))
-            ->when($startDate, fn ($q) => $q->where('csd.tanggal', '>=', $startDate))
-            ->where('csd.tanggal', '<=', $endDate)
+            ->when($startDate, fn ($q) => $q->whereDate('csd.tanggal', '>=', $startDate))
+            ->whereDate('csd.tanggal', '<=', $endDate)
             ->select(
                 'csd.content_id', 'csd.tanggal', 'csd.views', 'csd.likes', 'csd.comments',
                 'contents.judul', 'contents.url', 'contents.thumbnail_url', 'contents.platform_id',
@@ -119,7 +126,16 @@ class DashboardController extends Controller
             if ($p->slug === 'youtube') {
                 $ch = ChannelStatsDaily::latest('tanggal')->first();
                 $fol = $ch?->subscriber_count;
-                $folGrowth = ChannelStatsDaily::getFollowersGained($startDate, $endDate);
+
+                // Coba ambil exact growth dari YouTube Analytics API (subscribersGained - subscribersLost)
+                $analyticsGrowth = $this->youtubeAnalytics->getSubscriberGrowth($startDate, $endDate);
+                if ($analyticsGrowth !== null) {
+                    $folGrowth = $analyticsGrowth['net'];
+                } else {
+                    // Fallback aman ke selisih snapshot historis jika Analytics API belum diotorisasi / gagal
+                    $folGrowth = ChannelStatsDaily::getFollowersGained($startDate, $endDate);
+                }
+
                 $folDate = $ch?->tanggal ? Carbon::parse($ch->tanggal)->toDateString() : null;
             } else {
                 $ps = PlatformStatsDaily::where('platform_id', $p->id)->latest('tanggal')->first();
@@ -222,8 +238,8 @@ class DashboardController extends Controller
             ->where('contents.status', 'aktif')
             ->when(! $isAll, fn ($q) => $q->where('contents.platform_id', $currentPlatform->id))
             ->select('csd.tanggal', DB::raw('SUM(csd.views) as total_views'))
-            ->when($startDate, fn ($q) => $q->where('csd.tanggal', '>=', $startDate))
-            ->where('csd.tanggal', '<=', $endDate)
+            ->when($startDate, fn ($q) => $q->whereDate('csd.tanggal', '>=', $startDate))
+            ->whereDate('csd.tanggal', '<=', $endDate)
             ->groupBy('csd.tanggal')
             ->orderBy('csd.tanggal');
 
@@ -262,15 +278,16 @@ class DashboardController extends Controller
         $today = Carbon::today();
 
         if ($period === 'custom' && $customStart && $customEnd) {
-            return [$customStart, $customEnd, "{$customStart} s/d {$customEnd}"];
+            $toText = __('app.dashboard.to');
+            return [$customStart, $customEnd, "{$customStart} {$toText} {$customEnd}"];
         }
 
         return match ($period) {
-            'today' => [$today->toDateString(), $today->toDateString(), 'Hari Ini'],
-            '15'    => [$today->copy()->subDays(14)->toDateString(), $today->toDateString(), '15 Hari Terakhir'],
-            '30'    => [$today->copy()->subDays(29)->toDateString(), $today->toDateString(), '30 Hari Terakhir'],
-            'all'   => [null, $today->toDateString(), 'Semua Waktu'],
-            default => [$today->copy()->subDays(6)->toDateString(), $today->toDateString(), '7 Hari Terakhir'],
+            'today' => [$today->toDateString(), $today->toDateString(), __('app.dashboard.today')],
+            '15'    => [$today->copy()->subDays(14)->toDateString(), $today->toDateString(), __('app.dashboard.last_15_days')],
+            '30'    => [$today->copy()->subDays(29)->toDateString(), $today->toDateString(), __('app.dashboard.last_30_days')],
+            'all'   => [null, $today->toDateString(), __('app.dashboard.all_time')],
+            default => [$today->copy()->subDays(6)->toDateString(), $today->toDateString(), __('app.dashboard.last_7_days')],
         };
     }
 }

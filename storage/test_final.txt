@@ -1,0 +1,8 @@
+﻿
+Deprecated: PHP Startup: session.sid_length INI setting is deprecated in Unknown on line 0
+
+Deprecated: PHP Startup: session.sid_bits_per_character INI setting is deprecated in Unknown on line 0
+
+Deprecated: PHP Startup: session.sid_length INI setting is deprecated in Unknown on line 0
+Deprecated: PHP Startup: session.sid_bits_per_character INI setting is deprecated in Unknown on line 0
+{"tool":"phpunit","result":"passed","tests":122,"passed":122,"assertions":489,"duration_ms":15394}

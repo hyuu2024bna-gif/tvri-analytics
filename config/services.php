@@ -38,6 +38,10 @@ return [
     'youtube' => [
         'key' => env('YOUTUBE_API_KEY'),
         'channel_id' => env('YOUTUBE_CHANNEL_ID'),
+        'client_id' => env('YOUTUBE_CLIENT_ID'),
+        'client_secret' => env('YOUTUBE_CLIENT_SECRET'),
+        'redirect_uri' => env('YOUTUBE_REDIRECT_URI'),
+        'refresh_token' => env('YOUTUBE_REFRESH_TOKEN'),
     ],
 
     'facebook' => [
@@ -46,6 +50,30 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
         'graph_api_version' => env('META_GRAPH_API_VERSION', 'v19.0'),
         'page_id' => env('META_FACEBOOK_PAGE_ID'),
+    ],
+
+    'tiktok' => [
+        'client_key' => env('TIKTOK_CLIENT_KEY'),
+        'client_secret' => env('TIKTOK_CLIENT_SECRET'),
+        'redirect_uri' => env('TIKTOK_REDIRECT_URI'),
+        'max_pages' => (int) env('TIKTOK_MAX_PAGES', 500),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Platform Sync Schedule Flags (Production Mode Management)
+    |--------------------------------------------------------------------------
+    |
+    | Production Tahap 1 mengaktifkan YouTube & TikTok.
+    | Platform lain (Instagram, Facebook) dinonaktifkan sementara dan dapat
+    | diaktifkan kemudian via environment variables tanpa perlu mengubah codebase.
+    |
+    */
+    'sync' => [
+        'youtube' => filter_var(env('YOUTUBE_SYNC_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'tiktok' => filter_var(env('TIKTOK_SYNC_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'instagram' => filter_var(env('INSTAGRAM_SYNC_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
+        'facebook' => filter_var(env('FACEBOOK_SYNC_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
     ],
 
 ];

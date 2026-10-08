@@ -183,7 +183,12 @@ class SyncFacebookContents extends Command
         if (! $accountSnapshotExists) {
             $socialAccount = SocialAccount::where('platform_id', $platform->id)->first();
             if (! $socialAccount) {
-                $socialAccount = SocialAccount::whereNotNull('page_id')->first();
+                $igPlatform = Platform::where('slug', 'instagram')->first();
+                $socialAccount = $igPlatform
+                    ? SocialAccount::where('platform_id', $igPlatform->id)
+                        ->whereNotNull('page_id')
+                        ->first()
+                    : null;
             }
 
             PlatformStatsDaily::create([

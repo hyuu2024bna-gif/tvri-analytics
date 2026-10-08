@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login | TVRI Aceh Analytics</title>
+    <title>{{ __('app.auth.page_title') }}</title>
 
     {{-- Bootstrap 5 --}}
     <link
@@ -405,25 +405,51 @@
             font-size: 22px;
         }
 
-        /* Copyright */
+        /* Copyright & Legal */
 
-        .copyright {
+        .login-footer-container {
             position: absolute;
-
-            bottom: 45px;
+            bottom: 30px;
             left: 50%;
-
             transform: translateX(-50%);
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
 
-            width: 55%;
-
+        .login-legal-links {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 14px;
+            font-size: 13px;
+        }
 
+        .login-legal-links a {
             color: #536a99;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
 
-            font-size: 14px;
+        .login-legal-links a:hover {
+            color: var(--tvri-blue);
+            text-decoration: underline;
+        }
+
+        .login-legal-links .divider-dot {
+            color: #bfd0ec;
+            font-size: 10px;
+        }
+
+        .copyright {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #536a99;
+            font-size: 13px;
             white-space: nowrap;
         }
 
@@ -431,9 +457,7 @@
         .copyright::after {
             content: "";
             height: 1px;
-
             flex: 1;
-
             background: #bfd0ec;
         }
 
@@ -465,8 +489,9 @@
                 padding: 70px 8% 130px;
             }
 
-            .copyright {
-                bottom: 40px;
+            .login-footer-container {
+                bottom: 25px;
+                width: 85%;
             }
         }
 
@@ -536,9 +561,19 @@
                 font-size: 14px;
             }
 
+            .login-footer-container {
+                width: 90%;
+                bottom: 20px;
+            }
+
+            .login-legal-links {
+                font-size: 11px;
+                gap: 8px;
+            }
+
             .copyright {
-                width: 80%;
-                font-size: 12px;
+                font-size: 11px;
+                gap: 10px;
             }
         }
     </style>
@@ -569,20 +604,17 @@
             {{-- Judul --}}
             <div>
                 <h1 class="brand-title">
-                    Dashboard Analitik<br>
-                    Media Sosial
+                    {!! __('app.auth.brand_title') !!}
                 </h1>
 
                 <div class="brand-subtitle">
-                    TVRI Stasiun Aceh
+                    {{ __('app.auth.brand_subtitle') }}
                 </div>
 
                 <div class="brand-line"></div>
 
                 <p class="brand-description">
-                    Memonitor performa konten media sosial
-                    untuk mendukung penyebaran informasi
-                    yang lebih luas dan tepat sasaran.
+                    {{ __('app.auth.brand_description') }}
                 </p>
             </div>
 
@@ -590,7 +622,7 @@
             <div class="brand-footer">
 
                 <div class="tagline">
-                    Media Pemersatu Bangsa
+                    {{ __('app.auth.tagline') }}
                 </div>
 
                 <div class="footer-divider"></div>
@@ -629,13 +661,28 @@
 
         <div class="login-wrapper">
 
+            {{-- Language Switcher (Login Page) --}}
+            <div class="d-flex justify-content-end mb-3">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Language selector">
+                    <a href="{{ route('locale.switch', 'id') }}"
+                       class="btn {{ app()->getLocale() === 'id' ? 'btn-primary' : 'btn-outline-primary' }}"
+                       style="font-size: 13px; font-weight: 600; padding: 4px 12px;">
+                        🇮🇩 ID
+                    </a>
+                    <a href="{{ route('locale.switch', 'en') }}"
+                       class="btn {{ app()->getLocale() === 'en' ? 'btn-primary' : 'btn-outline-primary' }}"
+                       style="font-size: 13px; font-weight: 600; padding: 4px 12px;">
+                        🇬🇧 EN
+                    </a>
+                </div>
+            </div>
+
             <h1 class="welcome-title">
-                Selamat Datang
+                {{ __('app.auth.welcome_title') }}
             </h1>
 
             <p class="welcome-description">
-                Silakan masuk ke akun Anda untuk mengakses
-                dashboard analitik media sosial TVRI Stasiun Aceh.
+                {{ __('app.auth.welcome_desc') }}
             </p>
 
 
@@ -650,7 +697,7 @@
             {{-- Error Login --}}
             @if ($errors->any())
                 <div class="alert alert-danger mb-4">
-                    Email atau password yang Anda masukkan tidak sesuai.
+                    {{ __('app.auth.login_failed') }}
                 </div>
             @endif
 
@@ -669,7 +716,7 @@
                         name="email"
                         id="email"
                         class="form-control login-input @error('email') is-invalid @enderror"
-                        placeholder="Email atau Username"
+                        placeholder="{{ __('app.auth.email_or_username') }}"
                         value="{{ old('email') }}"
                         required
                         autofocus
@@ -689,7 +736,7 @@
                         name="password"
                         id="password"
                         class="form-control login-input"
-                        placeholder="Password"
+                        placeholder="{{ __('app.auth.password') }}"
                         required
                         autocomplete="current-password"
                     >
@@ -698,7 +745,7 @@
                         type="button"
                         class="password-toggle"
                         id="togglePassword"
-                        aria-label="Tampilkan password"
+                        aria-label="{{ __('app.auth.show_password') }}"
                     >
                         <i class="bi bi-eye-slash"></i>
                     </button>
@@ -722,7 +769,7 @@
                             class="form-check-label"
                             for="remember_me"
                         >
-                            Ingatkan saya
+                            {{ __('app.auth.remember_me') }}
                         </label>
 
                     </div>
@@ -733,7 +780,7 @@
                             href="{{ route('password.request') }}"
                             class="forgot-link"
                         >
-                            Lupa password?
+                            {{ __('app.auth.forgot_password') }}
                         </a>
                     @endif
 
@@ -745,7 +792,7 @@
                     type="submit"
                     class="login-button"
                 >
-                    Masuk
+                    {{ __('app.auth.login_button') }}
                     <i class="bi bi-arrow-right"></i>
                 </button>
 
@@ -754,9 +801,16 @@
         </div>
 
 
-        {{-- Copyright --}}
-        <div class="copyright">
-            © {{ date('Y') }} TVRI Stasiun Aceh
+        {{-- Copyright & Legal Links --}}
+        <div class="login-footer-container">
+            <div class="login-legal-links">
+                <a href="{{ route('terms') }}">{{ __('app.legal.terms_of_service') }}</a>
+                <span class="divider-dot">•</span>
+                <a href="{{ route('privacy') }}">{{ __('app.legal.privacy_policy') }}</a>
+            </div>
+            <div class="copyright">
+                {{ __('app.auth.copyright', ['year' => date('Y')]) }}
+            </div>
         </div>
 
     </section>
