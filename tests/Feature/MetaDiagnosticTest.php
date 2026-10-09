@@ -20,16 +20,27 @@ class MetaDiagnosticTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_diagnostic_meta_can_be_accessed_by_authenticated_user(): void
+    public function test_diagnostic_meta_cannot_be_accessed_by_staf_user(): void
     {
-        $user = User::factory()->create();
+        $staf = User::factory()->create(['role' => 'staf']);
+
+        $response = $this
+            ->actingAs($staf)
+            ->get('/diagnostic/meta');
+
+        $response->assertForbidden();
+    }
+
+    public function test_diagnostic_meta_can_be_accessed_by_admin_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
 
         Http::fake([
             'https://graph.facebook.com/*' => Http::response(['data' => []], 200),
         ]);
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($admin)
             ->get('/diagnostic/meta');
 
         $response->assertOk();
@@ -45,7 +56,7 @@ class MetaDiagnosticTest extends TestCase
 
     public function test_diagnostic_meta_does_not_expose_app_secret_or_access_token(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $dummySecret = 'super_secret_fb_app_secret_xyz123';
         $dummyToken = 'EAAGm0PXqBZCYBA_dummy_secret_access_token_999';
@@ -98,7 +109,7 @@ class MetaDiagnosticTest extends TestCase
 
     public function test_diagnostic_meta_clearly_distinguishes_business_portfolio_access(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         Http::fake([
             'https://graph.facebook.com/*' => Http::response([], 200),
@@ -114,7 +125,7 @@ class MetaDiagnosticTest extends TestCase
 
     public function test_facebook_card_displays_page_id_and_live_page_name_without_instagram_identity(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $igPlatform = Platform::create([
             'nama' => 'Instagram',
@@ -168,7 +179,7 @@ class MetaDiagnosticTest extends TestCase
 
     public function test_facebook_card_uses_honest_fallback_when_page_name_api_fails(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $igPlatform = Platform::create([
             'nama' => 'Instagram',

@@ -29,6 +29,7 @@ class TikTokTestVideosEndpointTest extends TestCase
 
         $this->user = User::factory()->create([
             'email' => 'video_tester@tvri.co.id',
+            'role'  => 'admin',
         ]);
 
         $this->tiktokPlatform = Platform::firstOrCreate(

@@ -30,6 +30,7 @@ class TikTokAuthControllerTest extends TestCase
 
         $this->user = User::factory()->create([
             'email' => 'admin_test@tvri.co.id',
+            'role'  => 'admin',
         ]);
 
         $this->tiktokPlatform = Platform::firstOrCreate(

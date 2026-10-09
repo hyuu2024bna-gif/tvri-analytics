@@ -48,7 +48,10 @@ class TikTokRefreshTokenTest extends TestCase
         Config::set('services.tiktok.client_secret', 'test_client_secret_refresh');
         Config::set('services.tiktok.redirect_uri', 'http://localhost/tiktok/callback');
 
-        $this->user = User::factory()->create(['email' => 'refresh_tester@tvri.co.id']);
+        $this->user = User::factory()->create([
+            'email' => 'refresh_tester@tvri.co.id',
+            'role'  => 'admin',
+        ]);
 
         $this->tiktokPlatform = Platform::firstOrCreate(
             ['slug' => 'tiktok'],

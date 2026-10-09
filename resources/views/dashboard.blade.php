@@ -414,9 +414,17 @@
                     </p>
                 </div>
                 <div class="pt-3 border-t border-slate-100 mt-3">
-                    <p class="text-[11px] text-slate-500 truncate">
-                        {{ $isAll ? __('app.kpi.all_active_platforms') : __('app.kpi.platform_active', ['name' => $currentPlatform->nama]) }}
-                    </p>
+                    @if($newContentInPeriod > 0)
+                        <p class="text-[11px] font-semibold flex items-center gap-1 text-emerald-600">
+                            <span>▲ +{{ number_format($newContentInPeriod) }}</span>
+                            <span class="text-slate-400 font-normal">({{ $periodLabel }})</span>
+                        </p>
+                    @else
+                        <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                            <span>0 konten baru</span>
+                            <span class="text-slate-400">({{ $periodLabel }})</span>
+                        </p>
+                    @endif
                 </div>
             </div>
 
@@ -516,9 +524,16 @@
                     </p>
                 </div>
                 <div class="pt-3 border-t border-slate-100 mt-3">
-                    <p class="text-[11px] text-slate-500 truncate">
-                        {{ $totalLikes !== null ? __('app.kpi.valid_likes_accumulated') : __('app.kpi.metric_unavailable') }}
-                    </p>
+                    @if($totalLikesGrowth !== null)
+                        <p class="text-[11px] font-semibold flex items-center gap-1 {{ $totalLikesGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }}">
+                            <span>{{ ($totalLikesGrowth >= 0 ? '▲ +' : '▼ ') . number_format($totalLikesGrowth) }}</span>
+                            <span class="text-slate-400 font-normal">({{ $periodLabel }})</span>
+                        </p>
+                    @else
+                        <p class="text-[11px] text-slate-500 truncate">
+                            {{ $totalLikes !== null ? __('app.kpi.valid_likes_accumulated') : __('app.kpi.metric_unavailable') }}
+                        </p>
+                    @endif
                 </div>
             </div>
 
@@ -537,9 +552,16 @@
                     </p>
                 </div>
                 <div class="pt-3 border-t border-slate-100 mt-3">
-                    <p class="text-[11px] text-slate-500 truncate">
-                        {{ $totalComments !== null ? __('app.kpi.public_responses_accumulated') : __('app.kpi.metric_unavailable') }}
-                    </p>
+                    @if($totalCommentsGrowth !== null)
+                        <p class="text-[11px] font-semibold flex items-center gap-1 {{ $totalCommentsGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }}">
+                            <span>{{ ($totalCommentsGrowth >= 0 ? '▲ +' : '▼ ') . number_format($totalCommentsGrowth) }}</span>
+                            <span class="text-slate-400 font-normal">({{ $periodLabel }})</span>
+                        </p>
+                    @else
+                        <p class="text-[11px] text-slate-500 truncate">
+                            {{ $totalComments !== null ? __('app.kpi.public_responses_accumulated') : __('app.kpi.metric_unavailable') }}
+                        </p>
+                    @endif
                 </div>
             </div>
 

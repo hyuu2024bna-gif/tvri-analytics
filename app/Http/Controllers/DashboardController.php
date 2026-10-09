@@ -64,30 +64,51 @@ class DashboardController extends Controller
                 : max(0, (int) $last->views - (int) $first->views);
 
             $likesTerkini = $last->likes !== null ? (int) $last->likes : null;
+            $likesBertambah = ($last->likes === null || $first->likes === null)
+                ? null
+                : max(0, (int) $last->likes - (int) $first->likes);
+
             $commentsTerkini = $last->comments !== null ? (int) $last->comments : null;
+            $commentsBertambah = ($last->comments === null || $first->comments === null)
+                ? null
+                : max(0, (int) $last->comments - (int) $first->comments);
 
             return (object) [
-                'content_id'       => $first->content_id,
-                'platform_id'      => $last->platform_id,
-                'platform_slug'    => $last->platform_slug,
-                'platform_nama'    => $last->platform_nama,
-                'judul'            => $last->judul,
-                'url'              => $last->url,
-                'thumbnail_url'    => $last->thumbnail_url,
-                'views_terkini'    => $viewsTerkini,
-                'views_bertambah'  => $viewsBertambah,
-                'likes_terkini'    => $likesTerkini,
-                'comments_terkini' => $commentsTerkini,
-                'tanggal_terakhir' => $last->tanggal,
+                'content_id'         => $first->content_id,
+                'platform_id'        => $last->platform_id,
+                'platform_slug'      => $last->platform_slug,
+                'platform_nama'      => $last->platform_nama,
+                'judul'              => $last->judul,
+                'url'                => $last->url,
+                'thumbnail_url'      => $last->thumbnail_url,
+                'views_terkini'      => $viewsTerkini,
+                'views_bertambah'    => $viewsBertambah,
+                'likes_terkini'      => $likesTerkini,
+                'likes_bertambah'    => $likesBertambah,
+                'comments_terkini'   => $commentsTerkini,
+                'comments_bertambah' => $commentsBertambah,
+                'tanggal_terakhir'   => $last->tanggal,
             ];
         })->values();
 
-        // 1. Total Konten Aktif
+        // 1. Total Konten Aktif (semua waktu, hanya status aktif)
         $totalContentQuery = Content::where('status', 'aktif');
         if (! $isAll) {
             $totalContentQuery->where('platform_id', $currentPlatform->id);
         }
         $totalVideo = $totalContentQuery->count();
+
+        // 1b. Konten Baru dalam Periode (berdasarkan tanggal_upload, NULL dikecualikan)
+        $newContentQuery = Content::where('status', 'aktif')
+            ->whereNotNull('tanggal_upload');
+        if (! $isAll) {
+            $newContentQuery->where('platform_id', $currentPlatform->id);
+        }
+        if ($startDate) {
+            $newContentQuery->whereDate('tanggal_upload', '>=', $startDate);
+        }
+        $newContentQuery->whereDate('tanggal_upload', '<=', $endDate);
+        $newContentInPeriod = $newContentQuery->count();
 
         // 2. Total Views Terkini (Strict NULL Semantics: abaikan NULL, jangan jadikan 0 palsu)
         $hasViews = $rows->contains(fn ($r) => $r->views_terkini !== null);
@@ -101,9 +122,17 @@ class DashboardController extends Controller
         $hasLikes = $rows->contains(fn ($r) => $r->likes_terkini !== null);
         $totalLikes = $hasLikes ? $rows->whereNotNull('likes_terkini')->sum('likes_terkini') : null;
 
+        // 4b. Total Likes Bertambah (dalam periode yang dipilih)
+        $hasLikesBertambah = $rows->contains(fn ($r) => $r->likes_bertambah !== null);
+        $totalLikesGrowth = $hasLikesBertambah ? $rows->whereNotNull('likes_bertambah')->sum('likes_bertambah') : null;
+
         // 5. Total Comments Terkini
         $hasComments = $rows->contains(fn ($r) => $r->comments_terkini !== null);
         $totalComments = $hasComments ? $rows->whereNotNull('comments_terkini')->sum('comments_terkini') : null;
+
+        // 5b. Total Comments Bertambah (dalam periode yang dipilih)
+        $hasCommentsBertambah = $rows->contains(fn ($r) => $r->comments_bertambah !== null);
+        $totalCommentsGrowth = $hasCommentsBertambah ? $rows->whereNotNull('comments_bertambah')->sum('comments_bertambah') : null;
 
         // 6. Followers / Subscribers
         $availablePlatforms = Platform::whereHas('contents', function ($q) {
@@ -256,10 +285,13 @@ class DashboardController extends Controller
             'customStart'         => $customStart,
             'customEnd'           => $customEnd,
             'totalVideo'          => $totalVideo,
+            'newContentInPeriod'  => $newContentInPeriod,
             'totalViewsTerkini'   => $totalViewsTerkini,
             'totalViewsBertambah' => $totalViewsBertambah,
             'totalLikes'          => $totalLikes,
+            'totalLikesGrowth'    => $totalLikesGrowth,
             'totalComments'       => $totalComments,
+            'totalCommentsGrowth' => $totalCommentsGrowth,
             'currentFollowers'    => $currentFollowers,
             'totalFollowers'      => $hasAnyFollowers ? $totalFollowers : null,
             'followersGrowth'     => $followersGrowth,
