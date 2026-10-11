@@ -11,10 +11,14 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MetaDiagnosticController;
 use App\Http\Controllers\TikTokAuthController;
 use App\Http\Controllers\YoutubeAuthController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');

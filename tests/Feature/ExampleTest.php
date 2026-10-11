@@ -8,12 +8,13 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Root route redirects guests to /login.
      */
     public function test_the_application_returns_a_successful_response(): void
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        // Root route now redirects: guests → /login, authenticated → /dashboard
+        $response->assertRedirect(route('login'));
     }
 }
