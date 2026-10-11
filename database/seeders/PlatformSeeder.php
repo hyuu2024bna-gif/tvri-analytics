@@ -9,11 +9,22 @@ class PlatformSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('platforms')->insert([
-            ['nama' => 'YouTube', 'slug' => 'youtube', 'created_at' => now(), 'updated_at' => now()],
-            ['nama' => 'Instagram', 'slug' => 'instagram', 'created_at' => now(), 'updated_at' => now()],
-            ['nama' => 'TikTok', 'slug' => 'tiktok', 'created_at' => now(), 'updated_at' => now()],
-            ['nama' => 'Facebook', 'slug' => 'facebook', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        $platforms = [
+            ['slug' => 'youtube',   'nama' => 'YouTube'],
+            ['slug' => 'instagram', 'nama' => 'Instagram'],
+            ['slug' => 'tiktok',    'nama' => 'TikTok'],
+            ['slug' => 'facebook',  'nama' => 'Facebook'],
+        ];
+
+        foreach ($platforms as $platform) {
+            DB::table('platforms')->updateOrInsert(
+                ['slug' => $platform['slug']],
+                [
+                    'nama'       => $platform['nama'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
     }
 }
