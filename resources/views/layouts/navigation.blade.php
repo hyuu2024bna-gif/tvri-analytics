@@ -197,7 +197,7 @@
                @click="open = false"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition duration-150
                       {{ request()->routeIs('dashboard') ? 'bg-[#003882] text-white shadow-sm' : 'text-slate-700 hover:bg-[#e8f0fe] hover:text-[#003882]' }}">
-                <svg class="w-4.5 h-4.5 flex-shrink-0 {{ request()->routeIs('dashboard') ? 'text-blue-200' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('dashboard') ? 'text-blue-200' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
                 {{ __('app.nav.dashboard') }}
@@ -206,7 +206,7 @@
                @click="open = false"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition duration-150
                       {{ request()->routeIs('reports.*') ? 'bg-[#003882] text-white shadow-sm' : 'text-slate-700 hover:bg-[#e8f0fe] hover:text-[#003882]' }}">
-                <svg class="w-4.5 h-4.5 flex-shrink-0 {{ request()->routeIs('reports.*') ? 'text-blue-200' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('reports.*') ? 'text-blue-200' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 {{ __('app.nav.reports') }}
@@ -216,7 +216,7 @@
                    @click="open = false"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition duration-150
                           {{ request()->routeIs('instagram.*') ? 'bg-[#003882] text-white shadow-sm' : 'text-slate-700 hover:bg-[#e8f0fe] hover:text-[#003882]' }}">
-                    <svg class="w-4.5 h-4.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <circle cx="12" cy="12" r="4" stroke-width="2" stroke-linecap="round"/>
                         <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
@@ -248,7 +248,7 @@
             <a href="{{ route('profile.edit') }}"
                @click="open = false"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#e8f0fe] hover:text-[#003882] transition duration-150">
-                <svg class="w-4.5 h-4.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
                 {{ __('app.nav.profile') }}
@@ -290,7 +290,7 @@
                 <button type="submit"
                         onclick="event.preventDefault(); this.closest('form').submit();"
                         class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition duration-150">
-                    <svg class="w-4.5 h-4.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
                     {{ __('app.nav.logout') }}
