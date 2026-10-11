@@ -8,44 +8,23 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- P1: TVRI Logo (ganti Laravel hexagon) -->
+                <!-- Logo area (logo Laravel sudah dihapus, tidak diganti elemen baru) -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 group">
-                        <img src="{{ asset('images/tvri-logo.webp') }}"
-                             alt="Logo TVRI"
-                             class="h-8 w-auto object-contain"
-                             onerror="this.style.display='none'">
-                        <span class="flex flex-col leading-tight">
-                            <span class="text-[13px] font-extrabold tracking-tight text-[#003882] group-hover:text-[#00265c] transition-colors duration-150">KMB Analytics</span>
-                            <span class="text-[10px] font-medium text-slate-400 tracking-wide">TVRI Stasiun Aceh</span>
-                        </span>
-                    </a>
+                    {{-- Tidak ada logo --}}
                 </div>
 
-                <!-- Navigation Links (Desktop) — P2: TVRI navy active indicator -->
-                <div class="hidden space-x-1 sm:ms-8 sm:flex sm:items-center">
-                    <a href="{{ route('dashboard') }}"
-                       class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition duration-150 ease-in-out
-                              {{ request()->routeIs('dashboard')
-                                 ? 'bg-[#003882] text-white shadow-sm'
-                                 : 'text-slate-600 hover:text-[#003882] hover:bg-[#e8f0fe]' }}">
+                <!-- Navigation Links (Desktop) -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('app.nav.dashboard') }}
-                    </a>
-                    <a href="{{ route('reports.form') }}"
-                       class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition duration-150 ease-in-out
-                              {{ request()->routeIs('reports.*')
-                                 ? 'bg-[#003882] text-white shadow-sm'
-                                 : 'text-slate-600 hover:text-[#003882] hover:bg-[#e8f0fe]' }}">
+                    </x-nav-link>
+                    <x-nav-link :href="route('reports.form')" :active="request()->routeIs('reports.*')">
                         {{ __('app.nav.reports') }}
-                    </a>
+                    </x-nav-link>
                     @if(config('services.sync.instagram', false))
-                        <a href="{{ route('instagram.status') }}"
-                           class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition duration-150 ease-in-out
-                                  {{ request()->routeIs('instagram.*')
-                                     ? 'bg-[#003882] text-white shadow-sm'
-                                     : 'text-slate-600 hover:text-[#003882] hover:bg-[#e8f0fe]' }}">
+                        <x-nav-link :href="route('instagram.status')" :active="request()->routeIs('instagram.*')">
                             {{ __('app.nav.instagram') }}
-                        </a>
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
