@@ -80,6 +80,18 @@
                             {{ __('app.nav.profile') }}
                         </a>
 
+                        @if(Auth::user()?->role === 'admin')
+                            <!-- Kelola Pengguna (Admin) -->
+                            <a href="{{ route('admin.users.index') }}"
+                               class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition duration-100
+                                      {{ request()->routeIs('admin.users.*') ? 'bg-[#e8f0fe] text-[#003882] font-semibold' : 'text-slate-700 hover:bg-[#e8f0fe] hover:text-[#003882]' }}">
+                                <svg class="w-4 h-4 {{ request()->routeIs('admin.users.*') ? 'text-[#003882]' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                Kelola Pengguna
+                            </a>
+                        @endif
+
                         <!-- Divider -->
                         <div class="border-t border-slate-100 mx-1"></div>
 
@@ -253,6 +265,17 @@
                 </svg>
                 {{ __('app.nav.profile') }}
             </a>
+            @if(Auth::user()?->role === 'admin')
+                <a href="{{ route('admin.users.index') }}"
+                   @click="open = false"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition duration-150
+                          {{ request()->routeIs('admin.users.*') ? 'bg-[#003882] text-white shadow-sm' : 'text-slate-700 hover:bg-[#e8f0fe] hover:text-[#003882]' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('admin.users.*') ? 'text-blue-200' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    Kelola Pengguna
+                </a>
+            @endif
         </div>
 
         <!-- Language section -->

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacebookAuthController;
 use App\Http\Controllers\InstagramAuthController;
@@ -79,6 +80,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/facebook/test', [FacebookAuthController::class, 'test'])->name('facebook.test');
     Route::get('/facebook/test-posts', [FacebookAuthController::class, 'testPosts'])->name('facebook.test-posts');
     Route::get('/diagnostic/meta', [MetaDiagnosticController::class, 'index'])->name('diagnostic.meta');
+});
+
+// Manajemen Pengguna (khusus administrator)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+    Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
 });
 
 require __DIR__.'/auth.php';
